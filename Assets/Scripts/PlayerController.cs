@@ -9,12 +9,16 @@ public class PlayerController : MonoBehaviour
     [Header("Variables")]
     public float moveSpeed;
     public float currentSpeed;
+    public float gravity;
+    public bool isGrounded;
+    public bool ceilingAbove;
 
 
     [Header("Sprint")]
     public float sprintSpeed;
     public bool isSprinting;
     public bool canSprint;
+    public bool allowSprint;
 
     [Space(10)]
     public float currentStamina;
@@ -30,13 +34,20 @@ public class PlayerController : MonoBehaviour
     public float crouchSpeed;
     public bool isCrouching;
     public bool canCrouch;
+    public bool allowCrouch;
 
 
     [Header("Other")]
     public Animator anim;
+    public Transform groundCkeck;
+    public Transform ceilingCkeck;
+    public LayerMask groundMask;
+    public LayerMask ceilingMask;
     GameObject plModel;
     CharacterController controller;
 
+
+    Vector3 velocity;
     float inputX;
     float inputZ;
 
@@ -60,7 +71,6 @@ public class PlayerController : MonoBehaviour
         UpdateAnimations();
         Crouch();
         Sprint();
-
     }
 
 
@@ -81,22 +91,41 @@ public class PlayerController : MonoBehaviour
         Vector3 move = transform.right * inputX + transform.forward * inputZ;
         // implement movement onto the CharacterController
         controller.Move(move * currentSpeed * Time.deltaTime);
+
+        // ground and ceiling check
+        isGrounded = Physics.CheckSphere(groundCkeck.position, .5f, groundMask);
+        ceilingAbove = Physics.CheckSphere(ceilingCkeck.position, .5f, ceilingMask);
+
+        // if grounded
+        if (isGrounded)
+        {
+            // small velocity
+            velocity.y = -5f;
+        }
+        else
+        {
+            // if not grounded - dude be falling
+            velocity.y += gravity * Time.deltaTime;
+            controller.Move(velocity * Time.deltaTime);
+        }
     }
 
     void Sprint()
     {
         // If allowed to / unlocked sprint
-        if (canSprint)
+        if (allowSprint)
         {
             // if u get sprint input
             // and if moving forward (works sides too - can't sprint backwards)
-            if (Input.GetKey(KeyCode.LeftShift) && (inputZ > 0f || inputX != 0f) && currentStamina > 0f)
+            if (Input.GetKey(KeyCode.LeftShift) && canSprint && (inputZ > 0f || inputX != 0f) && currentStamina > 0f)
             {
                 isSprinting = true;
+                canCrouch = false;
             }
             else
             {
                 isSprinting = false;
+                canCrouch = true;
             }
 
             // when sprinting
@@ -109,7 +138,7 @@ public class PlayerController : MonoBehaviour
                 // set stamina current cooldown timer back to max
                 staminaCurrentTimer = staminaTimer;
             }
-            else
+            else if (!isCrouching)
             {
                 // else go back to default
                 currentSpeed = moveSpeed;
@@ -157,16 +186,18 @@ public class PlayerController : MonoBehaviour
     void Crouch()
     {
         // If allowed to / unlocked crouch
-        if (canCrouch)
+        if (allowCrouch)
         {
             // if u get crouch input
-            if (Input.GetKey(KeyCode.LeftControl))
+            if (Input.GetKey(KeyCode.LeftControl) && canCrouch)
             {
+                canSprint = false;
                 isCrouching = true;
                 currentSpeed = crouchSpeed;
             }
-            else
+            else if (!isSprinting && !ceilingAbove)
             {
+                canSprint = true;
                 isCrouching = false;
                 currentSpeed = moveSpeed;
 
@@ -175,10 +206,10 @@ public class PlayerController : MonoBehaviour
             // when crouching
             if (isCrouching)
             {
-                controller.height = 1.5f;
-                controller.center = new Vector3(0f, -0.75f, 0f);
+                controller.height = 2f;
+                controller.center = new Vector3(0f, -0.5f, 0f);
             }
-            else
+            else 
             {
                 controller.height = 3f;
                 controller.center = new Vector3(0f, 0f, 0f);
@@ -203,4 +234,20 @@ public class PlayerController : MonoBehaviour
             anim.SetBool("isWalking", false);
         }
     }
+
+
+    // private void OnTriggerEnter(Collider other) 
+    // {
+    //     if (other.tag == "Ground")
+    //     {
+    //         isGrounded = true;
+    //     }
+    // }
+    //     private void OnTriggerExit(Collider other) 
+    // {
+    //     if (other.tag == "Ground")
+    //     {
+    //         isGrounded = false;
+    //     }
+    // }
 }

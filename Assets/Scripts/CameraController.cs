@@ -6,6 +6,7 @@ public class CameraController : MonoBehaviour
 {
     [Header("Variables")]
     public float mouseSensitivity;
+    public bool canLook;
 
     // public Vector3 camPos;
     public Vector3 camOffset;
@@ -30,16 +31,19 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.position = plCamPoint.transform.position + camOffset;
+        if (canLook)
+        {
+            transform.position = plCamPoint.transform.position + camOffset;
 
-        mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-        mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
-        
-        yRotation -= mouseY;
-        yRotation = Mathf.Clamp(yRotation, -60f, 90f);
-        plHead.transform.localRotation = Quaternion.Euler(yRotation, 0f, 0f);
-        transform.localRotation = Quaternion.Euler(yRotation, 0f, 0f);
+            mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
+            mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+            
+            yRotation -= mouseY;
+            yRotation = Mathf.Clamp(yRotation, -60f, 90f);
+            plHead.transform.localRotation = Quaternion.Euler(yRotation, 0f, 0f);
+            transform.localRotation = Quaternion.Euler(yRotation, 0f, 0f);
 
-        plBody.Rotate(Vector3.up * mouseX);
+            plBody.Rotate(Vector3.up * mouseX);
+        }
     }
 }
