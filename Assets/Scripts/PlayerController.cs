@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     public float gravity;
     public bool isGrounded;
     public bool ceilingAbove;
+    private bool canMove = true;
 
 
     [Header("Sprint")]
@@ -67,6 +68,8 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(!canMove)
+        return;
         Movement();
         UpdateAnimations();
         Crouch();
@@ -90,6 +93,7 @@ public class PlayerController : MonoBehaviour
         // set up new transform
         Vector3 move = transform.right * inputX + transform.forward * inputZ;
         // implement movement onto the CharacterController
+
         controller.Move(move * currentSpeed * Time.deltaTime);
 
         // ground and ceiling check
@@ -235,6 +239,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void SetCanMove(bool newMove)
+    {
+        canMove = newMove;
+    }
 
     // private void OnTriggerEnter(Collider other) 
     // {

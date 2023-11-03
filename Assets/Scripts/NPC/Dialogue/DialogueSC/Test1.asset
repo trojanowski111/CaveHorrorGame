@@ -13,5 +13,11 @@ MonoBehaviour:
   m_Name: Test1
   m_EditorClassIdentifier: 
   dialogueLines:
-  - line: Yo G
-    voiceLine: {fileID: 0}
+  - dialogueLine: yo whats up
+    voiceLine: {fileID: 8300000, guid: b8068cf5824c086449be10a6eeefcba0, type: 3}
+  - dialogueLine: so I heard this dialogue is meant to be working
+    voiceLine: {fileID: 8300000, guid: f2b421d7ef7ac4844b15ee456ff42cf5, type: 3}
+  - dialogueLine: shit is bugged ngl
+    voiceLine: {fileID: 8300000, guid: add6d777c01ef3b4a8bcd0f405539cd4, type: 3}
+  dialogueOption1: {fileID: 11400000, guid: d68ebe6a9d694d845886bb1e1d1eb44b, type: 2}
+  dialogueOption2: {fileID: 11400000, guid: 1f2740fdaada3cb4cae418e63f17c303, type: 2}

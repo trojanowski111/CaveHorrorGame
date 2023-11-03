@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerDialogueManager : MonoBehaviour
 {
     [SerializeField] private LayerMask occlusionLayerMask;
+    [SerializeField] private float npcRaycastOffset;
 
     private PlayerController playerController;
     private CameraController cameraController;
@@ -12,22 +13,12 @@ public class PlayerDialogueManager : MonoBehaviour
 
     private NPCDialogue currentNpc;
 
+    [SerializeField] private float dialogueFov;
+
     private void Awake()
     {
         playerController = GetComponent<PlayerController>();
         cameraController = Camera.main.GetComponent<CameraController>();
-    }
-    private void EnterDialogue()
-    {
-        inDialogue = true;
-        playerController.canCrouch = false;
-        cameraController.mouseSensitivity = 0;
-    }
-    private void ExitDialogue()
-    {
-        inDialogue = false;
-        playerController.canCrouch = true;
-        cameraController.mouseSensitivity = 250;
     }
     private void Update()
     {
@@ -35,26 +26,59 @@ public class PlayerDialogueManager : MonoBehaviour
         {
             if(Input.GetKeyDown("e"))
             {
-                EnterDialogue();
-                currentNpc.DialogueStarted();
+                inDialogue = !inDialogue;
+
+                if(inDialogue)
+                {
+                    EnterDialogue();
+                    currentNpc.DialogueStarted();
+                }
+                else
+                {
+                    ExitDialogue();
+                }
             }
         }
         if(inDialogue)
         {
-            cameraController.transform.LookAt(currentNpc.GetFocusPoint());
+            cameraController.FocusCamera(currentNpc.GetFocusPoint());
+
+            if(Input.GetMouseButtonDown(0))
+            {
+                if(currentNpc.EndOfDialogue())
+                {
+                    currentNpc.DialogueLeft();
+                    ExitDialogue();
+                }
+                else
+                {
+                    currentNpc.NextDialogue();
+                }
+            }
         }
     }
     private void OnTriggerStay(Collider other)
     {
         if(!other.TryGetComponent<NPCDialogue>(out NPCDialogue npcDialogue) || inDialogue)  
         return;
-
+        NPCFound(npcDialogue);
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        if(other.TryGetComponent<NPCDialogue>(out NPCDialogue npcDialogue))  
+        {
+            npcDialogue.PlayerLeft();
+            canTalkToNpc = false;
+            Debug.Log("LEFT NPC");
+        }   
+    }
+    private void NPCFound(NPCDialogue npcDialogue)
+    {
         Vector3 directionToNpc = npcDialogue.transform.position - transform.position;
 
         Debug.Log("CLOSE TO NPC");
 
-        Debug.DrawRay(transform.position, directionToNpc);
-        if(Physics.Raycast(transform.position, directionToNpc, 10, occlusionLayerMask))
+        if(Physics.Raycast(transform.position + Vector3.up * npcRaycastOffset, directionToNpc, 10, occlusionLayerMask))
         {
             Debug.Log("Not visible to NPC");
             return;
@@ -64,12 +88,26 @@ public class PlayerDialogueManager : MonoBehaviour
         canTalkToNpc = true;
         Debug.Log("Visible to NPC");
     }
-    private void OnTriggerExit(Collider other)
+    private void EnterDialogue()
     {
-        if(other.TryGetComponent<NPCDialogue>(out NPCDialogue npcDialogue))  
-        {
-            npcDialogue.PlayerLeft();
-            Debug.Log("LEFT NPC");
-        }   
+        inDialogue = true;
+        playerController.SetCanMove(false);
+        cameraController.SetCanLook(false);
+        cameraController.UpdateFov(dialogueFov, false);
+    }
+    private void ExitDialogue()
+    {
+        inDialogue = false;
+        playerController.SetCanMove(true);
+        cameraController.SetCanLook(true);
+        cameraController.UpdateFov(0, true);
+        currentNpc.DialogueLeft();
+    }
+    private void OnDrawGizmos()
+    {
+        if(!currentNpc)
+        return;
+        Vector3 directionToNpc = currentNpc.transform.position - transform.position;
+        Gizmos.DrawRay(transform.position + Vector3.up * npcRaycastOffset, directionToNpc);
     }
 }
