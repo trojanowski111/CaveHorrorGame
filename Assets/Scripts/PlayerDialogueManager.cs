@@ -4,16 +4,14 @@ public class PlayerDialogueManager : MonoBehaviour
 {
     [SerializeField] private LayerMask occlusionLayerMask;
     [SerializeField] private float npcRaycastOffset;
+    [SerializeField] private float dialogueFov;
+    [SerializeField] private float dialogueAngle;
 
     private PlayerController playerController;
     private CameraController cameraController;
-
     private bool inDialogue = false;
     private bool canTalkToNpc;
-
     private NPCDialogue currentNpc;
-
-    [SerializeField] private float dialogueFov;
 
     private void Awake()
     {
@@ -84,7 +82,7 @@ public class PlayerDialogueManager : MonoBehaviour
     {
         if(!other.TryGetComponent<NPCDialogue>(out NPCDialogue npcDialogue) || inDialogue)  
         return;
-        NPCFound(npcDialogue);
+        NpcFound(npcDialogue);
     }
     private void OnTriggerExit(Collider other)
     {
@@ -95,23 +93,37 @@ public class PlayerDialogueManager : MonoBehaviour
             Debug.Log("LEFT NPC");
         }   
     }
-    private void NPCFound(NPCDialogue npcDialogue)
+    private void NpcFound(NPCDialogue npcDialogue)
     {
         Vector3 directionToNpc = npcDialogue.transform.position - transform.position;
 
         Debug.Log("CLOSE TO NPC");
 
-        if(Physics.Raycast(transform.position + Vector3.up * npcRaycastOffset, directionToNpc, 10, occlusionLayerMask))
+        if(NpcInRange(directionToNpc))
+        {
+            currentNpc = npcDialogue;
+            currentNpc.PlayerClose(transform);
+            canTalkToNpc = true;
+            Debug.Log("Visible to NPC");
+        }
+        else
         {
             Debug.Log("Not visible to NPC");
             if(!inDialogue)
             canTalkToNpc = false;
-            return;
         }
-        currentNpc = npcDialogue;
-        currentNpc.PlayerClose(transform);
-        canTalkToNpc = true;
-        Debug.Log("Visible to NPC");
+    }
+    private bool NpcInRange(Vector3 direction)
+    {
+        if(Vector3.Angle(direction, transform.forward) > dialogueAngle)
+        {
+            return false;
+        }
+        if(Physics.Raycast(transform.position + Vector3.up * npcRaycastOffset, direction, 10, occlusionLayerMask))
+        {
+            return false;
+        }
+        return true;
     }
     private void EnterDialogue()
     {

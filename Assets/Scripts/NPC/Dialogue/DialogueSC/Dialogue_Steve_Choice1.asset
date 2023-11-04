@@ -13,15 +13,18 @@ MonoBehaviour:
   m_Name: Dialogue_Steve_Choice1
   m_EditorClassIdentifier: 
   dialogue:
-  - dialogueLine: So choice 1?
+  - allowToSkip: 1
+    dialogueLine: So choice 1?
     voiceLine: {fileID: 8300000, guid: b8068cf5824c086449be10a6eeefcba0, type: 3}
     dialogueEvent: {fileID: 0}
     choices: []
-  - dialogueLine: Choice 1 yep
+  - allowToSkip: 0
+    dialogueLine: Choice 1 yep
     voiceLine: {fileID: 8300000, guid: f2b421d7ef7ac4844b15ee456ff42cf5, type: 3}
-    dialogueEvent: {fileID: 11400000, guid: 8b47d5e2db53dad4a8a4b274adc3dc5d, type: 2}
+    dialogueEvent: {fileID: 11400000, guid: 303d509104d6e214b8f5905bda131f00, type: 2}
     choices: []
-  - dialogueLine: Good choice with choice 1
+  - allowToSkip: 1
+    dialogueLine: Good choice with choice 1
     voiceLine: {fileID: 8300000, guid: add6d777c01ef3b4a8bcd0f405539cd4, type: 3}
     dialogueEvent: {fileID: 0}
     choices: []

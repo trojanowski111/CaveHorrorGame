@@ -76,6 +76,7 @@ public class NPCDialogue : MonoBehaviour
     }
     public void PlayEndDialogue()
     {
+        audioSource.Stop();
         interactionPrompt.enabled = false;
         dialogueText.enabled = true;
 
@@ -127,7 +128,7 @@ public class NPCDialogue : MonoBehaviour
     }
     public bool IsEndOfDialogue()
     {
-        return currentLine >= currentDialogue.GetDialogueLength();
+        return currentLine >= currentDialogue.GetDialogueLength() - 1;
     }
     public void PlayerLeft()
     {

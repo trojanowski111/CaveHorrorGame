@@ -13,15 +13,18 @@ MonoBehaviour:
   m_Name: Dialogue_Steve_End
   m_EditorClassIdentifier: 
   dialogue:
-  - dialogueLine: LEAVE
+  - allowToSkip: 1
+    dialogueLine: LEAVE
     voiceLine: {fileID: 8300000, guid: b8068cf5824c086449be10a6eeefcba0, type: 3}
     dialogueEvent: {fileID: 0}
     choices: []
-  - dialogueLine: PLEASE
+  - allowToSkip: 1
+    dialogueLine: PLEASE
     voiceLine: {fileID: 8300000, guid: b8068cf5824c086449be10a6eeefcba0, type: 3}
     dialogueEvent: {fileID: 0}
     choices: []
-  - dialogueLine: 'OMG '
+  - allowToSkip: 0
+    dialogueLine: 'OMG '
     voiceLine: {fileID: 8300000, guid: add6d777c01ef3b4a8bcd0f405539cd4, type: 3}
     dialogueEvent: {fileID: 0}
     choices: []
