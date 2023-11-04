@@ -13,9 +13,9 @@ TagManager:
   - Water
   - UI
   - NPC
-  - 
-  - 
-  - 
+  - Interactable
+  - CanPush
+  - Inspectable
   - 
   - 
   - 
