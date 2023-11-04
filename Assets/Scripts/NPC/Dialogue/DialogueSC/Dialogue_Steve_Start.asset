@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29fafeaab47eb994c9c8b5fa071f229a, type: 3}
+  m_Name: Dialogue_Steve_Start
+  m_EditorClassIdentifier: 
+  dialogue:
+  - dialogueLine: Hi
+    voiceLine: {fileID: 8300000, guid: b8068cf5824c086449be10a6eeefcba0, type: 3}
+    dialogueEvent: {fileID: 0}
+    choices: []
+  - dialogueLine: Spawned an object
+    voiceLine: {fileID: 8300000, guid: f2b421d7ef7ac4844b15ee456ff42cf5, type: 3}
+    dialogueEvent: {fileID: 11400000, guid: 8b47d5e2db53dad4a8a4b274adc3dc5d, type: 2}
+    choices:
+    - {fileID: 11400000, guid: 0131e5055640bbb4f9236e701a624d0e, type: 2}
+    - {fileID: 11400000, guid: fc96d0b6eced066469d7ee1ad449f2fa, type: 2}
+  - dialogueLine: I'm done now
+    voiceLine: {fileID: 8300000, guid: add6d777c01ef3b4a8bcd0f405539cd4, type: 3}
+    dialogueEvent: {fileID: 0}
+    choices: []

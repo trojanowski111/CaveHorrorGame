@@ -22,20 +22,40 @@ public class PlayerDialogueManager : MonoBehaviour
     }
     private void Update()
     {
-        if(canTalkToNpc)
-        {
-            if(Input.GetKeyDown("e"))
-            {
-                inDialogue = !inDialogue;
+        if(!canTalkToNpc)
+        return;
 
-                if(inDialogue)
+        if(Input.GetKeyDown("e"))
+        {
+            if(currentNpc.IsWaitingForChoice())
+            return;
+
+            inDialogue = !inDialogue;
+            
+            if(inDialogue)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+
+                EnterDialogue();
+
+                if(currentNpc.IsEndOfDialogue())
                 {
-                    EnterDialogue();
-                    currentNpc.DialogueStarted();
+                    currentNpc.PlayEndDialogue();
                 }
                 else
                 {
+                    currentNpc.DialogueStarted();
+                }
+            }
+            else
+            {
+                if(!currentNpc.IsWaitingForChoice())
+                {
                     ExitDialogue();
+
+                    Cursor.lockState = CursorLockMode.Locked;
+                    Cursor.visible = false;
                 }
             }
         }
@@ -45,12 +65,15 @@ public class PlayerDialogueManager : MonoBehaviour
 
             if(Input.GetMouseButtonDown(0))
             {
-                if(currentNpc.EndOfDialogue())
+                if(currentNpc.IsEndOfDialogue())
                 {
                     currentNpc.DialogueLeft();
                     ExitDialogue();
+
+                    Cursor.lockState = CursorLockMode.Locked;
+                    Cursor.visible = false;
                 }
-                else
+                else if(!currentNpc.IsWaitingForChoice())
                 {
                     currentNpc.NextDialogue();
                 }
@@ -81,10 +104,12 @@ public class PlayerDialogueManager : MonoBehaviour
         if(Physics.Raycast(transform.position + Vector3.up * npcRaycastOffset, directionToNpc, 10, occlusionLayerMask))
         {
             Debug.Log("Not visible to NPC");
+            if(!inDialogue)
+            canTalkToNpc = false;
             return;
         }
-        npcDialogue.PlayerClose(transform);
         currentNpc = npcDialogue;
+        currentNpc.PlayerClose(transform);
         canTalkToNpc = true;
         Debug.Log("Visible to NPC");
     }

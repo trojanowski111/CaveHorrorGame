@@ -10,14 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 29fafeaab47eb994c9c8b5fa071f229a, type: 3}
-  m_Name: Test1
+  m_Name: Dialogue_Steve_Choice2
   m_EditorClassIdentifier: 
-  dialogueLines:
-  - dialogueLine: yo whats up
+  dialogue:
+  - dialogueLine: So choice 2?
     voiceLine: {fileID: 8300000, guid: b8068cf5824c086449be10a6eeefcba0, type: 3}
-  - dialogueLine: so I heard this dialogue is meant to be working
+    dialogueEvent: {fileID: 0}
+    choices: []
+  - dialogueLine: Choice 2 yep
     voiceLine: {fileID: 8300000, guid: f2b421d7ef7ac4844b15ee456ff42cf5, type: 3}
-  - dialogueLine: shit is bugged ngl
+    dialogueEvent: {fileID: 11400000, guid: 8b47d5e2db53dad4a8a4b274adc3dc5d, type: 2}
+    choices: []
+  - dialogueLine: Good choice with choice 2
     voiceLine: {fileID: 8300000, guid: add6d777c01ef3b4a8bcd0f405539cd4, type: 3}
-  dialogueOption1: {fileID: 11400000, guid: d68ebe6a9d694d845886bb1e1d1eb44b, type: 2}
-  dialogueOption2: {fileID: 11400000, guid: 1f2740fdaada3cb4cae418e63f17c303, type: 2}
+    dialogueEvent: {fileID: 0}
+    choices: []
