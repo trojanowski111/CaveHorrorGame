@@ -4081,7 +4081,7 @@ GameObject:
   - component: {fileID: 857999986}
   - component: {fileID: 857999985}
   m_Layer: 6
-  m_Name: NPC (1)
+  m_Name: NPC_Matthew
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4273,8 +4273,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62496ea52fe88544184a867b91a4a7be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dialogueStart: {fileID: 11400000, guid: 5da2aefcae175464dac6bae35724303e, type: 2}
-  dialogueEnd: {fileID: 11400000, guid: af6171823c79dbd4194da95e0130977b, type: 2}
+  dialogueStart: {fileID: 11400000, guid: a44a8f87e5ad23b469537d2e0f8f9194, type: 2}
+  dialogueEnd: {fileID: 11400000, guid: acd9e84752e8ea342a28a40362ccf4e2, type: 2}
   audioSource: {fileID: 857999985}
   npcHeadLook: {fileID: 857999988}
   focusPointForPlayer: {fileID: 1834672424}
@@ -6292,6 +6292,84 @@ Transform:
   - {fileID: 398431860}
   m_Father: {fileID: 9261035}
   m_LocalEulerAnglesHint: {x: 8.805781, y: 20.923813, z: -29.776157}
+--- !u!1001 &1409280342
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2264440469861833295, guid: e8d01247b957e1245a7b5918e4b073b8,
+        type: 3}
+      propertyPath: m_Name
+      value: Floor (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6634843149351247636, guid: e8d01247b957e1245a7b5918e4b073b8,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 9.399575
+      objectReference: {fileID: 0}
+    - target: {fileID: 6634843149351247636, guid: e8d01247b957e1245a7b5918e4b073b8,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.35809
+      objectReference: {fileID: 0}
+    - target: {fileID: 6634843149351247636, guid: e8d01247b957e1245a7b5918e4b073b8,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 5.89
+      objectReference: {fileID: 0}
+    - target: {fileID: 6634843149351247636, guid: e8d01247b957e1245a7b5918e4b073b8,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.51
+      objectReference: {fileID: 0}
+    - target: {fileID: 6634843149351247636, guid: e8d01247b957e1245a7b5918e4b073b8,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 6634843149351247636, guid: e8d01247b957e1245a7b5918e4b073b8,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.8683742
+      objectReference: {fileID: 0}
+    - target: {fileID: 6634843149351247636, guid: e8d01247b957e1245a7b5918e4b073b8,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.4959094
+      objectReference: {fileID: 0}
+    - target: {fileID: 6634843149351247636, guid: e8d01247b957e1245a7b5918e4b073b8,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6634843149351247636, guid: e8d01247b957e1245a7b5918e4b073b8,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6634843149351247636, guid: e8d01247b957e1245a7b5918e4b073b8,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 59.459
+      objectReference: {fileID: 0}
+    - target: {fileID: 6634843149351247636, guid: e8d01247b957e1245a7b5918e4b073b8,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6634843149351247636, guid: e8d01247b957e1245a7b5918e4b073b8,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: e8d01247b957e1245a7b5918e4b073b8, type: 3}
 --- !u!1 &1413512067
 GameObject:
   m_ObjectHideFlags: 0
@@ -9539,7 +9617,7 @@ GameObject:
   - component: {fileID: 2105978955}
   - component: {fileID: 2105978960}
   m_Layer: 6
-  m_Name: NPC
+  m_Name: NPC_Rachel
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9660,7 +9738,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 0.457
+  m_Volume: 0.181
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -10101,6 +10179,7 @@ SceneRoots:
   - {fileID: 786732709}
   - {fileID: 1904426056}
   - {fileID: 245537445390965532}
+  - {fileID: 1409280342}
   - {fileID: 1126897269}
   - {fileID: 679908570}
   - {fileID: 232414301}

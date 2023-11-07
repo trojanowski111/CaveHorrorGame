@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class ItemInspect : MonoBehaviour
 {
+    [SerializeField] private InputReader inputReader;
     public float rotationSpeed;
 
     [Header("Components")]
@@ -20,103 +20,118 @@ public class ItemInspect : MonoBehaviour
     GameObject camObj;
     PlayerController plSc;
     CameraController camSc;
+    private RaycastHit raycastHit;
 
-    // Start is called before the first frame update
-    void Start()
+    private void OnEnable()
     {
-        plPointStartPos = inFrontOfPlayerPoint.transform.localPosition;
-
-        textPrompt.SetActive(false);
-
+        inputReader.interactEvent += BeginInteraction;
+        inputReader.cameraMoveEvent += Rotate;
+        inputReader.inspectionZoomEvent += Zoom;
+        inputReader.leaveInpectionEvent += EndInteraction;
+    }
+    private void OnDisable()
+    {
+        inputReader.interactEvent -= BeginInteraction;
+        inputReader.cameraMoveEvent -= Rotate;
+        inputReader.inspectionZoomEvent -= Zoom;
+        inputReader.leaveInpectionEvent -= EndInteraction;
+    }
+    private void Awake()
+    {
         camObj = GameObject.FindGameObjectWithTag("MainCamera").gameObject;
         plSc = transform.gameObject.GetComponent<PlayerController>();
         camSc = camObj.gameObject.GetComponent<CameraController>();
     }
-
-    // Update is called once per frame
-    void Update()
+    void Start()
     {
-        Interaction();
-        Rotate();
-        Zoom();
+        plPointStartPos = inFrontOfPlayerPoint.transform.localPosition;
+        textPrompt.SetActive(false);
     }
 
-    void Rotate()
+    void FixedUpdate()
     {
-        if (currentObject != null)
-        {
-            float rotX = Input.GetAxis("Mouse X") * rotationSpeed;
-            float rotY = Input.GetAxis("Mouse Y") * -rotationSpeed;
-
-            Vector3 right = Vector3.Cross(camObj.transform.up, currentObject.transform.position - camObj.transform.position);
-            Vector3 up = Vector3.Cross(currentObject.transform.position - camObj.transform.position, right);
-
-            currentObject.transform.rotation = Quaternion.AngleAxis(-rotX, up) * currentObject.transform.rotation;
-            currentObject.transform.rotation = Quaternion.AngleAxis(-rotY, right) * currentObject.transform.rotation;
-        }
+        InspectUI();
     }
-
-    void Zoom()
+    private void BeginInteraction() // on input with the item
     {
-        if (currentObject != null)
-        {
-            if (Input.GetAxis("Mouse ScrollWheel") > 0f && inFrontOfPlayerPoint.transform.localPosition.z < 1f) // forward
-            {
-                inFrontOfPlayerPoint.transform.localPosition += new Vector3(0f,0f,.1f);
-            }
-            else if (Input.GetAxis("Mouse ScrollWheel") < 0f && inFrontOfPlayerPoint.transform.localPosition.z > .5f) // backwards
-            {
-                inFrontOfPlayerPoint.transform.localPosition += new Vector3(0f,0f,-.1f);
-            }
-        }
-    }
+        if(!InspectRaycast())
+        return;
 
-    void Interaction()
+        if(currentObject != null)
+        return;
+        
+        // begin inspection
+        currentObject = raycastHit.transform.gameObject;
+        currentObject.transform.parent = inFrontOfPlayerPoint.transform;
+
+        // store value for start position & rotation
+        startPos = currentObject.transform.position;
+        startRot = currentObject.transform.rotation;
+        // put it in front of the player / eye view
+        currentObject.transform.position = inFrontOfPlayerPoint.transform.position;
+        // disable movement etc
+        plSc.allowCrouch = false;   
+        plSc.allowSprint = false;
+        plSc.SetCanMove(false);
+        camSc.SetCanLook(false);
+    }
+    private void EndInteraction()
     {
         // exit inspection
-        if (Input.GetKeyDown(KeyCode.Escape) && currentObject != null)
+        if (currentObject == null)
+        return;
+
+        // put it back in starting position & rotation
+        currentObject.transform.position = startPos;
+        currentObject.transform.rotation = startRot;
+        currentObject.transform.parent = null;
+        currentObject = null;
+
+        inFrontOfPlayerPoint.transform.localPosition = plPointStartPos;
+
+        // enable movement etc
+        plSc.allowCrouch = true;   
+        plSc.allowSprint = true;
+        plSc.SetCanMove(true);
+        camSc.SetCanLook(true);
+    }
+    void Rotate(Vector2 cameraInput)
+    {
+        if (currentObject == null)
+        return;
+
+        float rotX = cameraInput.x * rotationSpeed;
+        float rotY = cameraInput.y * -rotationSpeed;
+
+        Vector3 right = Vector3.Cross(camObj.transform.up, currentObject.transform.position - camObj.transform.position);
+        Vector3 up = Vector3.Cross(currentObject.transform.position - camObj.transform.position, right);
+
+        currentObject.transform.rotation = Quaternion.AngleAxis(-rotX, up) * currentObject.transform.rotation;
+        currentObject.transform.rotation = Quaternion.AngleAxis(-rotY, right) * currentObject.transform.rotation;
+    }
+    void Zoom(Vector2 zoomInput)
+    {
+        if(currentObject == null)
+        return;
+
+        if (zoomInput.y < 0f && inFrontOfPlayerPoint.transform.localPosition.z < 1f) // forward
         {
-            // put it back in starting position & rotation
-            currentObject.transform.position = startPos;
-            currentObject.transform.rotation = startRot;
-            currentObject.transform.parent = null;
-            currentObject = null;
-
-            inFrontOfPlayerPoint.transform.localPosition = plPointStartPos;
-
-            // enable movement etc
-            plSc.allowCrouch = true;   
-            plSc.allowSprint = true;
-            plSc.SetCanMove(true);
-            camSc.SetCanLook(true);
+            inFrontOfPlayerPoint.transform.localPosition += new Vector3(0f,0f,.1f);
         }
+        else if (zoomInput.y > 0f && inFrontOfPlayerPoint.transform.localPosition.z > .5f) // backwards
+        {
+            inFrontOfPlayerPoint.transform.localPosition += new Vector3(0f,0f,-.1f);
+        }
+    }
+    private void InspectUI()
+    {
+        bool rayDetected = InspectRaycast();
 
-        // pick up
-        RaycastHit hit;
-
-        if(Physics.Raycast(camObj.transform.position, camObj.transform.forward, out hit, 2f, inspectableObj, QueryTriggerInteraction.Collide))
+        if(rayDetected)
         {
             if (currentObject == null)
             {
                 textPrompt.SetActive(true);
-
-                // on input with the item
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    //set it as current obj
-                    currentObject = hit.transform.gameObject;
-                    currentObject.transform.parent = inFrontOfPlayerPoint.transform;
-                    // store value for start position & rotation
-                    startPos = currentObject.transform.position;
-                    startRot = currentObject.transform.rotation;
-                    // put it in front of the player / eye view
-                    currentObject.transform.position = inFrontOfPlayerPoint.transform.position;
-                    // disable movement etc
-                    plSc.allowCrouch = false;   
-                    plSc.allowSprint = false;
-                    plSc.SetCanMove(false);
-                    camSc.SetCanLook(false);
-                }
             }
             else
             {
@@ -127,5 +142,13 @@ public class ItemInspect : MonoBehaviour
         {
             textPrompt.SetActive(false);
         }
+    }
+    private GameObject InspectRaycast()
+    {
+        if(Physics.Raycast(camObj.transform.position, camObj.transform.forward, out raycastHit, 2f, inspectableObj, QueryTriggerInteraction.Collide))
+        {
+            return raycastHit.transform.gameObject;
+        }
+        return null;
     }
 }

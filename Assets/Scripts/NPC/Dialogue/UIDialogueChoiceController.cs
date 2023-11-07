@@ -1,22 +1,20 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DialogueChoiceButton : MonoBehaviour
+public class UIDialogueChoiceController : MonoBehaviour
 {
+    [SerializeField] private TextMeshProUGUI m_Choice;
     [SerializeField] private DialogueScriptableObject dialogue;
     [SerializeField] private NPCDialogue dialogueOwner;
-    private Button button;
-    private void Awake()
-    {
-        button = GetComponent<Button>();
-    }
+
     private void OnEnable()
     {
-        button.onClick.AddListener(UpdateDialogue);
+        GetComponent<Button>().onClick.AddListener(UpdateDialogue);
     }
     private void OnDisable()
     {
-        button.onClick.RemoveListener(UpdateDialogue);
+        GetComponent<Button>().onClick.RemoveListener(UpdateDialogue);
     }
     private void UpdateDialogue()
     {

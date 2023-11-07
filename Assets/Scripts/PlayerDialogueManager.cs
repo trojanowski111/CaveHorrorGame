@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class PlayerDialogueManager : MonoBehaviour
 {
+    [SerializeField] private InputReader inputReader;
     [SerializeField] private LayerMask occlusionLayerMask;
     [SerializeField] private float npcRaycastOffset;
     [SerializeField] private float dialogueFov;
@@ -10,71 +11,82 @@ public class PlayerDialogueManager : MonoBehaviour
     private PlayerController playerController;
     private CameraController cameraController;
     private bool inDialogue = false;
-    private bool canTalkToNpc;
     private NPCDialogue currentNpc;
 
+    private void OnEnable()
+    {
+        inputReader.interactEvent += TalkToNpc;
+        inputReader.skipDialogueEvent += SkipDialogue;
+    }
+    private void OnDisable()
+    {
+        inputReader.interactEvent -= TalkToNpc;
+        inputReader.skipDialogueEvent -= SkipDialogue;
+    }
     private void Awake()
     {
         playerController = GetComponent<PlayerController>();
         cameraController = Camera.main.GetComponent<CameraController>();
     }
-    private void Update()
+    private void TalkToNpc()
     {
-        if(!canTalkToNpc)
+        Debug.Log("INTERACT");
+        if(currentNpc == null)
         return;
 
-        if(Input.GetKeyDown("e"))
+        if(currentNpc.IsWaitingForChoice())
+        return;
+
+        inDialogue = !inDialogue;
+        
+        if(inDialogue)
         {
-            if(currentNpc.IsWaitingForChoice())
-            return;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
 
-            inDialogue = !inDialogue;
-            
-            if(inDialogue)
+            EnterDialogue();
+
+            if(currentNpc.IsEndOfDialogue())
             {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-
-                EnterDialogue();
-
-                if(currentNpc.IsEndOfDialogue())
-                {
-                    currentNpc.PlayEndDialogue();
-                }
-                else
-                {
-                    currentNpc.DialogueStarted();
-                }
+                currentNpc.PlayEndDialogue();
             }
             else
             {
-                if(!currentNpc.IsWaitingForChoice())
-                {
-                    ExitDialogue();
-
-                    Cursor.lockState = CursorLockMode.Locked;
-                    Cursor.visible = false;
-                }
+                currentNpc.DialogueStarted();
             }
         }
-        if(inDialogue)
+        else
         {
-            cameraController.FocusCamera(currentNpc.GetFocusPoint());
-
-            if(Input.GetMouseButtonDown(0))
+            if(!currentNpc.IsWaitingForChoice())
             {
-                if(currentNpc.IsEndOfDialogue())
-                {
-                    currentNpc.DialogueLeft();
-                    ExitDialogue();
+                ExitDialogue();
 
-                    Cursor.lockState = CursorLockMode.Locked;
-                    Cursor.visible = false;
-                }
-                else if(!currentNpc.IsWaitingForChoice())
-                {
-                    currentNpc.NextDialogue();
-                }
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+        }
+    }
+    private void SkipDialogue()
+    {
+        if(currentNpc == null)
+        return;
+
+        if(!inDialogue)
+        return;
+
+        if(currentNpc.CanSkipDialogue())
+        {
+            if(currentNpc.IsEndOfDialogue())
+            {
+                currentNpc.DialogueLeft();
+                ExitDialogue();
+
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+            else if(!currentNpc.IsWaitingForChoice())
+            {
+                currentNpc.NextDialogue();
             }
         }
     }
@@ -89,7 +101,7 @@ public class PlayerDialogueManager : MonoBehaviour
         if(other.TryGetComponent<NPCDialogue>(out NPCDialogue npcDialogue))  
         {
             npcDialogue.PlayerLeft();
-            canTalkToNpc = false;
+            currentNpc = null;
             Debug.Log("LEFT NPC");
         }   
     }
@@ -103,14 +115,11 @@ public class PlayerDialogueManager : MonoBehaviour
         {
             currentNpc = npcDialogue;
             currentNpc.PlayerClose(transform);
-            canTalkToNpc = true;
             Debug.Log("Visible to NPC");
         }
         else
         {
-            Debug.Log("Not visible to NPC");
-            if(!inDialogue)
-            canTalkToNpc = false;
+            currentNpc = null;
         }
     }
     private bool NpcInRange(Vector3 direction)
@@ -131,6 +140,7 @@ public class PlayerDialogueManager : MonoBehaviour
         playerController.SetCanMove(false);
         cameraController.SetCanLook(false);
         cameraController.UpdateFov(dialogueFov, false);
+        cameraController.FocusCamera(currentNpc.GetFocusPoint());
     }
     private void ExitDialogue()
     {

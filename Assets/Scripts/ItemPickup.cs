@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ItemPickup : MonoBehaviour
 {
+    [SerializeField] private InputReader inputReader;
     public GameObject textPrompt;
     public LayerMask interactableObj;
 
@@ -12,58 +13,81 @@ public class ItemPickup : MonoBehaviour
     public GameObject currentObject;
 
     GameObject camObj;
+    private RaycastHit raycastHit;
 
-    // Start is called before the first frame update
+    private void Awake()
+    {
+        camObj = GameObject.FindGameObjectWithTag("MainCamera").gameObject;
+    }
+    private void OnEnable()
+    {
+        inputReader.interactEvent += BeginPickup;
+        inputReader.leaveInpectionEvent += EndPickup;
+    }
+    private void OnDisable()
+    {
+        inputReader.interactEvent -= BeginPickup;
+        inputReader.leaveInpectionEvent -= EndPickup;
+    }
     void Start()
     {
         textPrompt.SetActive(false);
-
-        camObj = GameObject.FindGameObjectWithTag("MainCamera").gameObject;
     }
+    private void FixedUpdate()
+    {
+        InspectUI();
+    }
+    private void BeginPickup() // Object Pickup
+    {
+        if(!InspectRaycast())
+        return;
 
-    // Update is called once per frame
-    void Update()
+        if(currentObject != null)
+        return;
+        
+        currentObject = raycastHit.transform.gameObject;
+        currentObject.GetComponent<Rigidbody>().isKinematic = true;
+        currentObject.transform.parent = rightHand.transform;
+        currentObject.transform.position = rightHand.transform.position;
+        currentObject.transform.rotation = rightHand.transform.rotation;
+    }
+    private void EndPickup()
     {
         // Drop Object
-        if (Input.GetKeyDown(KeyCode.E) && currentObject != null)
+        if (currentObject == null)
+        return;
+
+        currentObject.transform.parent = null;
+        currentObject.transform.position = inFrontOfPlayerPoint.transform.position;
+        currentObject.GetComponent<Rigidbody>().isKinematic = false;
+        currentObject = null;
+    }
+    private void InspectUI()
+    {
+        bool rayDetected = InspectRaycast();
+
+        if(rayDetected)
         {
-            currentObject.transform.parent = null;
-            currentObject.transform.position = inFrontOfPlayerPoint.transform.position;
-            currentObject.GetComponent<Rigidbody>().isKinematic = false;
-            currentObject = null;
-        }
-
-
-        // if (currentObject != null)
-        // {
-        //     if (currentObject.transform.position != new Vector3(0f,0f,0f))
-        //     {
-        //         currentObject.transform.position = new Vector3(0f,0f,0f);
-        //     }
-        // }
-
-        // Object Pickup
-        RaycastHit hit;
-
-        if(Physics.Raycast(camObj.transform.position, camObj.transform.forward, out hit, 2f, interactableObj, QueryTriggerInteraction.Collide))
-        {
-            // if (currentObject == null)
-            // {
+            if (currentObject == null)
+            {
                 textPrompt.SetActive(true);
-
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    currentObject = hit.transform.gameObject;
-                    currentObject.GetComponent<Rigidbody>().isKinematic = true;
-                    currentObject.transform.parent = rightHand.transform;
-                    currentObject.transform.position = rightHand.transform.position;
-                    currentObject.transform.rotation = rightHand.transform.rotation;
-                }
+            }
+            // else
+            // {
+            //     textPrompt.SetActive(false);
             // }
         }
         else
         {
             textPrompt.SetActive(false);
         }
+    }
+    private GameObject InspectRaycast()
+    {
+        if(Physics.Raycast(camObj.transform.position, camObj.transform.forward, out raycastHit, 2f, interactableObj, QueryTriggerInteraction.Collide))
+        {
+            return raycastHit.transform.gameObject;
+        }
+        return null;
     }
 }

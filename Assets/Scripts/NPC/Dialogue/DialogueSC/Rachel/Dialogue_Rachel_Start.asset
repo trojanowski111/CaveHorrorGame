@@ -10,21 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 29fafeaab47eb994c9c8b5fa071f229a, type: 3}
-  m_Name: Dialogue_Steve_Choice2
+  m_Name: Dialogue_Rachel_Start
   m_EditorClassIdentifier: 
   dialogue:
   - allowToSkip: 1
-    dialogueLine: So choice 2?
-    voiceLine: {fileID: 8300000, guid: b8068cf5824c086449be10a6eeefcba0, type: 3}
+    dialogueLine: Hello sir
+    voiceLine: {fileID: 8300000, guid: e5d898af474bd8d4395e8ff9f548bc18, type: 3}
     dialogueEvent: {fileID: 0}
     choices: []
-  - allowToSkip: 1
-    dialogueLine: Choice 2 yep
-    voiceLine: {fileID: 8300000, guid: f2b421d7ef7ac4844b15ee456ff42cf5, type: 3}
-    dialogueEvent: {fileID: 0}
+  - allowToSkip: 0
+    dialogueLine: Do you need anything?
+    voiceLine: {fileID: 8300000, guid: 245f097d90abf984bb2b4c8acf8f816a, type: 3}
+    dialogueEvent: {fileID: 11400000, guid: 8b47d5e2db53dad4a8a4b274adc3dc5d, type: 2}
     choices: []
   - allowToSkip: 1
-    dialogueLine: Good choice with choice 2
-    voiceLine: {fileID: 8300000, guid: add6d777c01ef3b4a8bcd0f405539cd4, type: 3}
+    dialogueLine: Here have this cigarette I guess
+    voiceLine: {fileID: 8300000, guid: eef30e930cbf58147ab1108f0d2c3b92, type: 3}
     dialogueEvent: {fileID: 0}
     choices: []

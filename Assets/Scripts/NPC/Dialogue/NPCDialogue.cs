@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,6 +23,7 @@ public class NPCDialogue : MonoBehaviour
 
     private int currentLine = 0;
     private bool waitingForChoice = false;
+    private int randomNumDialogue; // really shit way to do it
 
     private void Start()
     {
@@ -53,6 +55,7 @@ public class NPCDialogue : MonoBehaviour
     }
     public void PlayDialogue()
     {
+        audioSource.Stop();
         if(currentLine < currentDialogue.GetDialogueLength())
         {
             if(currentDialogue.GetDialogueLine(currentLine) != null)
@@ -77,28 +80,20 @@ public class NPCDialogue : MonoBehaviour
     public void PlayEndDialogue()
     {
         audioSource.Stop();
+        currentDialogue = dialogueEnd;
         interactionPrompt.enabled = false;
         dialogueText.enabled = true;
 
-        int randomNum = Random.Range(0, dialogueEnd.GetDialogueLength());
-        
-        if(currentLine < currentDialogue.GetDialogueLength())
-        {
-            if(!dialogueEnd.GetCurrentDialogue(currentLine).allowToSkip)
-            {
-                if(audioSource.isPlaying)
-                return;
-            }
-        }
+        randomNumDialogue = Random.Range(0, currentDialogue.GetDialogueLength());
 
-        if(dialogueEnd.GetDialogueLine(randomNum) != null)
-        dialogueText.text = dialogueEnd.GetDialogueLine(randomNum);
+        if(currentDialogue.GetDialogueLine(randomNumDialogue) != null)
+        dialogueText.text = currentDialogue.GetDialogueLine(randomNumDialogue);
 
-        if(dialogueEnd.GetDialogueAudio(randomNum) != null)
-        audioSource.PlayOneShot(dialogueEnd.GetDialogueAudio(randomNum));
+        if(currentDialogue.GetDialogueAudio(randomNumDialogue) != null)
+        audioSource.PlayOneShot(currentDialogue.GetDialogueAudio(randomNumDialogue));
 
-        if(dialogueEnd.GetDialogueEvent(randomNum) != null)
-        dialogueEnd.GetDialogueEvent(randomNum).RaiseEvent();
+        if(currentDialogue.GetDialogueEvent(randomNumDialogue) != null)
+        currentDialogue.GetDialogueEvent(randomNumDialogue).RaiseEvent();
     }
     public void UpdateChoiceDialogue(DialogueScriptableObject newDialogueScriptableObject)
     {
@@ -106,29 +101,41 @@ public class NPCDialogue : MonoBehaviour
         {
             choiceButtons[i].gameObject.SetActive(false);
         }
-        currentLine = 0;
         currentDialogue = newDialogueScriptableObject;
-        waitingForChoice = false;
-        audioSource.Stop();
+        currentLine = 0;
         PlayDialogue();
+        waitingForChoice = false;
     }
     public void NextDialogue()
     {
-        if (currentLine < currentDialogue.GetDialogueLength())
-        {
-            if(!currentDialogue.GetCurrentDialogue(currentLine).allowToSkip)
-            {
-                if(audioSource.isPlaying)
-                return;
-            }
-        }
-        audioSource.Stop();
         currentLine ++;
+        audioSource.Stop();
         PlayDialogue();
     }
     public bool IsEndOfDialogue()
     {
         return currentLine >= currentDialogue.GetDialogueLength() - 1;
+    }
+    public bool CanSkipDialogue()
+    {
+        if(currentDialogue == dialogueEnd)
+        {
+            if(!currentDialogue.GetCurrentDialogue(randomNumDialogue).allowToSkip)
+            {
+                if(audioSource.isPlaying)
+                return false;
+            }
+            return true;
+        }
+        else
+        {
+            if(!currentDialogue.GetCurrentDialogue(currentLine).allowToSkip)
+            {
+                if(audioSource.isPlaying)
+                return false;
+            }
+            return true;
+        }
     }
     public void PlayerLeft()
     {

@@ -1,12 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class CameraController : MonoBehaviour
 {
     [Header("Components")]
+    [SerializeField] private InputReader inputReader;
     private Camera _camera;
 
     [Header("Variables")]
@@ -19,9 +16,16 @@ public class CameraController : MonoBehaviour
     [SerializeField] private Transform plHead;
     [SerializeField] private Transform plCamPoint;
     private float yRotation;
-
     private float defaultFov;
 
+    private void OnEnable()
+    {
+        inputReader.cameraMoveEvent += MoveCamera;
+    }
+    private void OnDisable()
+    {
+        inputReader.cameraMoveEvent -= MoveCamera;
+    }
     private void Awake()
     {
         _camera = Camera.main;    
@@ -31,16 +35,20 @@ public class CameraController : MonoBehaviour
         defaultFov = _camera.fieldOfView;
         Cursor.lockState = CursorLockMode.Locked;
     }
-
-    void Update()
+    private void Update()
+    {
+        // MoveCamera(cameraInput);
+        transform.position = plCamPoint.transform.position + camOffset;
+    }
+    private void MoveCamera(Vector2 lookInput)
     {
         if(!canLook)
         return;
 
-        transform.position = plCamPoint.transform.position + camOffset;
+        // transform.position = plCamPoint.transform.position + camOffset;
 
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+        float mouseX = lookInput.x * mouseSensitivity * Time.deltaTime;
+        float mouseY = lookInput.y * mouseSensitivity * Time.deltaTime;
         
         yRotation -= mouseY;
         yRotation = Mathf.Clamp(yRotation, -60f, 90f);

@@ -5,9 +5,6 @@ public class DialogueScriptableObject : ScriptableObject
 {
     [SerializeField] private DialogueStruct[] dialogue;
 
-    // [SerializeField] private DialogueScriptableObject dialogueOption1;
-    // [SerializeField] private DialogueScriptableObject dialogueOption2;
-
     public int GetDialogueLength()
     {
         return dialogue.Length;

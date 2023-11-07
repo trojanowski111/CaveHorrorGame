@@ -956,7 +956,7 @@ GameObject:
   - component: {fileID: 5227553916086235613}
   - component: {fileID: 8722761835513712146}
   - component: {fileID: 3639239974217542061}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -1020,14 +1020,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfa5d4fe8b36f5a4d9833f4119611197, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
+  inputReader: {fileID: 11400000, guid: 88cde36eb25511b4d855bb7b8cd1044d, type: 2}
+  moveSpeed: 4
   currentSpeed: 0
   gravity: -20
   isGrounded: 0
   ceilingAbove: 0
+  groundCheckRadius: 0.5
+  ceilingCheckRadius: 0.5
   sprintSpeed: 10
   isSprinting: 0
-  canSprint: 0
+  canSprint: 1
   allowSprint: 1
   currentStamina: 0
   maxStamina: 10
@@ -1045,10 +1048,10 @@ MonoBehaviour:
   ceilingCkeck: {fileID: 6175255956779580799}
   groundMask:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 9
   ceilingMask:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 9
 --- !u!114 &549260333382035384
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1061,6 +1064,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c73e39652d454d47a39ca3d2423b467, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inputReader: {fileID: 11400000, guid: 88cde36eb25511b4d855bb7b8cd1044d, type: 2}
   textPrompt: {fileID: 4568126953746190575}
   interactableObj:
     serializedVersion: 2
@@ -1080,6 +1084,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5274ac15258d7f94ba421edd90174407, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inputReader: {fileID: 11400000, guid: 88cde36eb25511b4d855bb7b8cd1044d, type: 2}
   rotationSpeed: 5
   textPrompt: {fileID: 851111175990375493}
   inspectableObj:
@@ -1116,6 +1121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afe519462b7b89d419f106c5ad72ead5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inputReader: {fileID: 11400000, guid: 88cde36eb25511b4d855bb7b8cd1044d, type: 2}
   occlusionLayerMask:
     serializedVersion: 2
     m_Bits: 1
@@ -1132,7 +1138,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4635067338454632635}
   - component: {fileID: 8494629440356050311}
-  - component: {fileID: 7709547518249157162}
+  - component: {fileID: 1361503813827754467}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -1170,7 +1176,7 @@ MonoBehaviour:
   m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
---- !u!114 &7709547518249157162
+--- !u!114 &1361503813827754467
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1179,17 +1185,38 @@ MonoBehaviour:
   m_GameObject: {fileID: 2923674786275175710}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
+  m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_SendPointerHoverToParent: 1
-  m_HorizontalAxis: Horizontal
-  m_VerticalAxis: Vertical
-  m_SubmitButton: Submit
-  m_CancelButton: Cancel
-  m_InputActionsPerSecond: 10
-  m_RepeatDelay: 0.5
-  m_ForceModuleActive: 0
+  m_MoveRepeatDelay: 0.5
+  m_MoveRepeatRate: 0.1
+  m_XRTrackingOrigin: {fileID: 0}
+  m_ActionsAsset: {fileID: -944628639613478452, guid: cbdcb8ed919b65e4cb1b3f7344ce2b18,
+    type: 3}
+  m_PointAction: {fileID: -8591077435029525334, guid: cbdcb8ed919b65e4cb1b3f7344ce2b18,
+    type: 3}
+  m_MoveAction: {fileID: -1986116853794421693, guid: cbdcb8ed919b65e4cb1b3f7344ce2b18,
+    type: 3}
+  m_SubmitAction: {fileID: -2186984999149531845, guid: cbdcb8ed919b65e4cb1b3f7344ce2b18,
+    type: 3}
+  m_CancelAction: {fileID: 8109924155037706617, guid: cbdcb8ed919b65e4cb1b3f7344ce2b18,
+    type: 3}
+  m_LeftClickAction: {fileID: 2711288856795788759, guid: cbdcb8ed919b65e4cb1b3f7344ce2b18,
+    type: 3}
+  m_MiddleClickAction: {fileID: 5225525603984767990, guid: cbdcb8ed919b65e4cb1b3f7344ce2b18,
+    type: 3}
+  m_RightClickAction: {fileID: -8300383139134313908, guid: cbdcb8ed919b65e4cb1b3f7344ce2b18,
+    type: 3}
+  m_ScrollWheelAction: {fileID: 5217625277842568476, guid: cbdcb8ed919b65e4cb1b3f7344ce2b18,
+    type: 3}
+  m_TrackedDevicePositionAction: {fileID: 5988751465271362226, guid: cbdcb8ed919b65e4cb1b3f7344ce2b18,
+    type: 3}
+  m_TrackedDeviceOrientationAction: {fileID: -7978748284745557758, guid: cbdcb8ed919b65e4cb1b3f7344ce2b18,
+    type: 3}
+  m_DeselectOnBackgroundClick: 1
+  m_PointerBehavior: 0
+  m_CursorLockBehavior: 0
 --- !u!1 &2981023208791593383
 GameObject:
   m_ObjectHideFlags: 0
@@ -1425,7 +1452,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9bc1464f89a5d343b305fb00cd5c476, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mouseSensitivity: 250
+  inputReader: {fileID: 11400000, guid: 88cde36eb25511b4d855bb7b8cd1044d, type: 2}
+  mouseSensitivity: 10
   camOffset: {x: 0, y: 0, z: 0}
   plBody: {fileID: 7067544199179199651}
   plHead: {fileID: 4423649032138659747}

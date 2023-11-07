@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField] private InputReader inputReader;
 
     [Header("Variables")]
     public float moveSpeed;
@@ -14,6 +15,8 @@ public class PlayerController : MonoBehaviour
     public bool ceilingAbove;
     private bool canMove = true;
 
+    [SerializeField] private float groundCheckRadius;
+    [SerializeField] private float ceilingCheckRadius;
 
     [Header("Sprint")]
     public float sprintSpeed;
@@ -30,13 +33,11 @@ public class PlayerController : MonoBehaviour
     public float staminaCurrentTimer;
     public Slider staminaSlider;
 
-
     [Header("Crouch")]
     public float crouchSpeed;
     public bool isCrouching;
     public bool canCrouch;
     public bool allowCrouch;
-
 
     [Header("Other")]
     public Animator anim;
@@ -46,15 +47,23 @@ public class PlayerController : MonoBehaviour
     public LayerMask ceilingMask;
     GameObject plModel;
     CharacterController controller;
+    float gravityVelocity;
+    private Vector2 movementInput;
+    private bool sprintInput;
+    private bool crouchInput;
 
-
-    Vector3 velocity;
-    float inputX;
-    float inputZ;
-
-
-    
-    // Start is called before the first frame update
+    private void OnEnable()
+    {
+        inputReader.moveEvent += SetMovementInput;
+        inputReader.sprintEvent += SetSprintInput;
+        inputReader.crouchEvent += SetCrouchInput;
+    }
+    private void OnDisable()
+    {
+        inputReader.moveEvent -= SetMovementInput;
+        inputReader.sprintEvent -= SetSprintInput;
+        inputReader.crouchEvent -= SetCrouchInput;
+    }
     void Start()
     {
         currentSpeed = moveSpeed;
@@ -64,64 +73,59 @@ public class PlayerController : MonoBehaviour
         anim = plModel.gameObject.GetComponent<Animator>();
         controller = transform.GetComponent<CharacterController>();
     }
-
-    // Update is called once per frame
     void Update()
     {
         if(!canMove)
         return;
-        Movement();
+        Movement(movementInput);
+        Sprint(sprintInput);
+        Crouch(crouchInput);
+        Gravity();
         UpdateAnimations();
-        Crouch();
-        Sprint();
     }
-
-
-
-
+    private void FixedUpdate()
+    {
+        // ground and ceiling check
+        isGrounded = Physics.CheckSphere(groundCkeck.position, groundCheckRadius, groundMask);
+        ceilingAbove = Physics.CheckSphere(ceilingCkeck.position, ceilingCheckRadius, ceilingMask);
+    }
 
     //####################
     //      Movement
     //####################
-
-    void Movement()
+    private void Gravity()
     {
-        // get input value
-        inputX = Input.GetAxisRaw("Horizontal");
-        inputZ = Input.GetAxisRaw("Vertical");
-
-        // set up new transform
-        Vector3 move = transform.right * inputX + transform.forward * inputZ;
-        // implement movement onto the CharacterController
-
-        controller.Move(move * currentSpeed * Time.deltaTime);
-
-        // ground and ceiling check
-        isGrounded = Physics.CheckSphere(groundCkeck.position, .5f, groundMask);
-        ceilingAbove = Physics.CheckSphere(ceilingCkeck.position, .5f, ceilingMask);
-
-        // if grounded
         if (isGrounded)
         {
             // small velocity
-            velocity.y = -5f;
+            gravityVelocity = -5f;
         }
         else
         {
             // if not grounded - dude be falling
-            velocity.y += gravity * Time.deltaTime;
-            controller.Move(velocity * Time.deltaTime);
+            gravityVelocity += gravity * Time.deltaTime;
         }
     }
+    private void Movement(Vector2 moveInput) // get input value
+    {
+        if(moveInput == Vector2.zero)
+        return;
+        // set up new transform
+        Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
 
-    void Sprint()
+        // implement movement onto the CharacterController
+        Vector3 combinedForces = move * currentSpeed + new Vector3(0, gravityVelocity, 0);
+
+        controller.Move(combinedForces * Time.deltaTime);
+    }
+    private void Sprint(bool sprintInput)
     {
         // If allowed to / unlocked sprint
         if (allowSprint)
         {
             // if u get sprint input
             // and if moving forward (works sides too - can't sprint backwards)
-            if (Input.GetKey(KeyCode.LeftShift) && canSprint && (inputZ > 0f || inputX != 0f) && currentStamina > 0f)
+            if (sprintInput && canSprint && (movementInput.y > 0f || movementInput.x != 0f) && currentStamina > 0f)
             {
                 isSprinting = true;
                 canCrouch = false;
@@ -186,14 +190,14 @@ public class PlayerController : MonoBehaviour
             staminaSlider.value = currentStamina;
         }
     }
-
-    void Crouch()
+    private void Crouch(bool crouchInput)
     {
+        Debug.Log(crouchInput);
         // If allowed to / unlocked crouch
         if (allowCrouch)
         {
             // if u get crouch input
-            if (Input.GetKey(KeyCode.LeftControl) && canCrouch)
+            if (crouchInput && canCrouch)
             {
                 canSprint = false;
                 isCrouching = true;
@@ -204,7 +208,6 @@ public class PlayerController : MonoBehaviour
                 canSprint = true;
                 isCrouching = false;
                 currentSpeed = moveSpeed;
-
             }
 
             // when crouching
@@ -220,16 +223,15 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
-    void UpdateAnimations()
+    private void UpdateAnimations()
     {
-        anim.SetFloat("InputZ", inputZ);
-        anim.SetFloat("InputX", inputX);
+        anim.SetFloat("InputZ", movementInput.y);
+        anim.SetFloat("InputX", movementInput.x);
         anim.SetBool("isRunning", isSprinting);
         anim.SetBool("isCrouching", isCrouching);
 
         // if one of the inputs is not a 0, player is in motion 
-        if (inputX != 0f || inputZ != 0f)
+        if (movementInput.x != 0f || movementInput.y != 0f)
         {
             anim.SetBool("isWalking", true);
         }
@@ -238,24 +240,25 @@ public class PlayerController : MonoBehaviour
             anim.SetBool("isWalking", false);
         }
     }
-
-    public void SetCanMove(bool newMove)
+    public void SetCanMove(bool newMove) // for dialogue, prob just turn the whole player movement script off through an event than this
     {
         canMove = newMove;
     }
-
-    // private void OnTriggerEnter(Collider other) 
-    // {
-    //     if (other.tag == "Ground")
-    //     {
-    //         isGrounded = true;
-    //     }
-    // }
-    //     private void OnTriggerExit(Collider other) 
-    // {
-    //     if (other.tag == "Ground")
-    //     {
-    //         isGrounded = false;
-    //     }
-    // }
+    private void SetMovementInput(Vector2 vector2Input)
+    {
+        movementInput = vector2Input;
+    }
+    private void SetSprintInput(bool newInput)
+    {
+        sprintInput = newInput;
+    }
+    private void SetCrouchInput(bool newInput)
+    {
+        crouchInput = newInput;
+    }
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawSphere(groundCkeck.position, groundCheckRadius);
+        Gizmos.DrawSphere(ceilingCkeck.position, ceilingCheckRadius);
+    }
 }

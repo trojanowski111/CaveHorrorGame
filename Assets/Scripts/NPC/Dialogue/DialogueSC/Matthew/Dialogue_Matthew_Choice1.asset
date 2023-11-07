@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29fafeaab47eb994c9c8b5fa071f229a, type: 3}
+  m_Name: Dialogue_Matthew_Choice1
+  m_EditorClassIdentifier: 
+  dialogue:
+  - allowToSkip: 1
+    dialogueLine: Alright let's go bi*tch boy!
+    voiceLine: {fileID: 8300000, guid: 43908fc9f8f16a8499b1ce1b17f5ee63, type: 3}
+    dialogueEvent: {fileID: 0}
+    choices: []
+  - allowToSkip: 0
+    dialogueLine: Weak as hell on god
+    voiceLine: {fileID: 8300000, guid: 4523e4145be132d4bb71cf7c2f165180, type: 3}
+    dialogueEvent: {fileID: 0}
+    choices: []
