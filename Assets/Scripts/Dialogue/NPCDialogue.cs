@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,7 +7,7 @@ public class NPCDialogue : MonoBehaviour
     [Header("Dialogue Scriptable")]
     [SerializeField] private DialogueScriptableObject dialogueStart;
     [SerializeField] private DialogueScriptableObject dialogueEnd;
-    private DialogueScriptableObject currentDialogue;
+    [SerializeField] private DialogueScriptableObject currentDialogue;
 
     [Header("General Components")]
     [SerializeField] private AudioSource audioSource;
@@ -25,10 +24,6 @@ public class NPCDialogue : MonoBehaviour
     private bool waitingForChoice = false;
     private int randomNumDialogue; // really shit way to do it
 
-    private void Start()
-    {
-        currentDialogue = dialogueStart;
-    }
     public void PlayerClose(Transform playerPos)
     {
         npcHeadLook.LookAt(playerPos);

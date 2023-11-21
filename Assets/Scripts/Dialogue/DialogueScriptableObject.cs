@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Dialogue", menuName = "ScriptableObjects/NPCDialogue", order = 1)]
+[CreateAssetMenu(fileName = "Dialogue", menuName = "Dialogue/NPC", order = 1)]
 public class DialogueScriptableObject : ScriptableObject
 {
     [SerializeField] private DialogueStruct[] dialogue;
