@@ -1,7 +1,6 @@
 using UnityEngine;
 using System;
 using UnityEngine.InputSystem;
-using Unity.VisualScripting;
 
 [CreateAssetMenu(fileName = "InputReader", menuName = "Input/InputReader")]
 public class InputReader : ScriptableObject, PlayerInputActions.IPlayerActions, PlayerInputActions.IUIActions, PlayerInputActions.IVehicleActions
@@ -28,6 +27,8 @@ public class InputReader : ScriptableObject, PlayerInputActions.IPlayerActions, 
     public Action rightClickEvent = delegate {};
     public Action trackedDevicePositionEvent = delegate {};
     public Action trackedDeviceOrientationEvent = delegate {};
+    public Action resumeEvent = delegate {};
+
 
     // ACTUAL INPUT ACTION CLASS
     private PlayerInputActions playerInput;
@@ -142,52 +143,57 @@ public class InputReader : ScriptableObject, PlayerInputActions.IPlayerActions, 
     // UI INPUT
     public void OnNavigate(InputAction.CallbackContext context)
     {
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
     }
 
     public void OnSubmit(InputAction.CallbackContext context)
     {
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
     }
 
     public void OnCancel(InputAction.CallbackContext context)
     {
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
     }
 
     public void OnPoint(InputAction.CallbackContext context)
     {
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
     }
 
     public void OnClick(InputAction.CallbackContext context)
     {
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
     }
 
     public void OnScrollWheel(InputAction.CallbackContext context)
     {
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
     }
 
     public void OnMiddleClick(InputAction.CallbackContext context)
     {
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
     }
 
     public void OnRightClick(InputAction.CallbackContext context)
     {
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
     }
 
     public void OnTrackedDevicePosition(InputAction.CallbackContext context)
     {
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
     }
 
     public void OnTrackedDeviceOrientation(InputAction.CallbackContext context)
     {
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
+    }
+    public void OnResume(InputAction.CallbackContext context)
+    {
+        if(context.performed)
+        resumeEvent.Invoke();
     }
     
     // DIALOGUE INPUT
