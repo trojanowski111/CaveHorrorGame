@@ -9,8 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 37bf167960aede147abcbe549bef1c8c, type: 3}
-  m_Name: MatthewDebug
+  m_Script: {fileID: 11500000, guid: 1e8753b09f584a54281b6cb94e7b0b23, type: 3}
+  m_Name: AIDialogueState
   m_EditorClassIdentifier: 
   nextState: {fileID: 11400000, guid: 376a1083bae28934585ce8bfc8bf24d9, type: 2}
-  timer: 5

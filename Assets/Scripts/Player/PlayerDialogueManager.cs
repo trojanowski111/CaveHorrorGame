@@ -1,4 +1,6 @@
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerDialogueManager : MonoBehaviour
 {
@@ -7,6 +9,12 @@ public class PlayerDialogueManager : MonoBehaviour
     [SerializeField] private float npcRaycastOffset;
     [SerializeField] private float dialogueFov;
     [SerializeField] private float dialogueAngle;
+    
+    [Header("UI")] // make a new class for dialogue ui
+    [SerializeField] private Canvas dialogueCanvas;
+    [SerializeField] private TextMeshProUGUI dialogueText;
+    [SerializeField] private TextMeshProUGUI interactionPrompt;
+    [SerializeField] private Button[] choiceButtons;
 
     private PlayerController playerController;
     private CameraController cameraController;
@@ -100,7 +108,6 @@ public class PlayerDialogueManager : MonoBehaviour
     {
         if(other.TryGetComponent<NPCDialogue>(out NPCDialogue npcDialogue))  
         {
-            npcDialogue.PlayerLeft();
             currentNpc = null;
             Debug.Log("LEFT NPC");
         }   
@@ -115,10 +122,15 @@ public class PlayerDialogueManager : MonoBehaviour
         {
             currentNpc = npcDialogue;
             currentNpc.PlayerClose(transform);
+
+            dialogueCanvas.enabled = true;
+            interactionPrompt.enabled = true;
+
             Debug.Log("Visible to NPC");
         }
         else
         {
+            dialogueCanvas.enabled = false;
             currentNpc = null;
         }
     }
@@ -136,6 +148,9 @@ public class PlayerDialogueManager : MonoBehaviour
     }
     private void EnterDialogue()
     {
+        interactionPrompt.enabled = false;
+        dialogueText.enabled = true;
+
         inDialogue = true;
         playerController.SetCanMove(false);
         cameraController.SetCanLook(false);
@@ -144,6 +159,14 @@ public class PlayerDialogueManager : MonoBehaviour
     }
     private void ExitDialogue()
     {
+        dialogueText.enabled = false;
+        interactionPrompt.enabled = true;
+
+        for(int i = 0; i < choiceButtons.Length; i++)
+        {
+            choiceButtons[i].gameObject.SetActive(false);
+        }
+
         inDialogue = false;
         playerController.SetCanMove(true);
         cameraController.SetCanLook(true);

@@ -23,7 +23,7 @@ public class AiAttackState : AiState
         
         if(attackCooldown <= 0)
         {
-            // agent.animator.SetTrigger("Chase");
+            agent.animator.SetTrigger("Chase");
         }
     }
     public void Exit(AiAgent agent)

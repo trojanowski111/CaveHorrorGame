@@ -192,7 +192,7 @@ public class PlayerController : MonoBehaviour
     }
     private void Crouch(bool crouchInput)
     {
-        Debug.Log(crouchInput);
+        // Debug.Log(crouchInput);
         // If allowed to / unlocked crouch
         if (allowCrouch)
         {

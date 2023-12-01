@@ -1,6 +1,5 @@
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Events;
 
 public class NPCDialogue : MonoBehaviour
 {
@@ -10,43 +9,41 @@ public class NPCDialogue : MonoBehaviour
     [SerializeField] private DialogueScriptableObject currentDialogue;
 
     [Header("General Components")]
+    private AIAgent aiAgent;
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private NPCHeadLook npcHeadLook;
     [SerializeField] private Transform focusPointForPlayer;
+    [SerializeField] private UnityEvent dialogueStartedEvent;
+    [SerializeField] private UnityEvent dialogueEndedEvent;
 
-    [Header("UI")]
-    [SerializeField] private Canvas dialogueCanvas;
-    [SerializeField] private TextMeshProUGUI dialogueText;
-    [SerializeField] private TextMeshProUGUI interactionPrompt;
-    [SerializeField] private Button[] choiceButtons;
+    [SerializeField] private AIState dialogueState;
 
+    private bool inDialogue;
     private int currentLine = 0;
     private bool waitingForChoice = false;
     private int randomNumDialogue; // really shit way to do it
 
+    private void Awake()
+    {
+        aiAgent = GetComponent<AIAgent>();
+        currentDialogue = dialogueStart;
+    }
     public void PlayerClose(Transform playerPos)
     {
         npcHeadLook.LookAt(playerPos);
-        dialogueCanvas.transform.LookAt(playerPos);
-
-        dialogueCanvas.enabled = true;
-        interactionPrompt.enabled = true;
     }
     public void DialogueStarted()
     {
-        interactionPrompt.enabled = false;
-        dialogueText.enabled = true;
+        aiAgent.SwitchState(dialogueState);
+        inDialogue = true;
+        dialogueStartedEvent.Invoke();
+        
         PlayDialogue();
     }
     public void DialogueLeft()
     {
-        dialogueText.enabled = false;
-        interactionPrompt.enabled = true;
-
-        for(int i = 0; i < choiceButtons.Length; i++)
-        {
-            choiceButtons[i].gameObject.SetActive(false);
-        }
+        inDialogue = false;
+        dialogueEndedEvent.Invoke();
     }
     public void PlayDialogue()
     {
@@ -54,7 +51,7 @@ public class NPCDialogue : MonoBehaviour
         if(currentLine < currentDialogue.GetDialogueLength())
         {
             if(currentDialogue.GetDialogueLine(currentLine) != null)
-            dialogueText.text = currentDialogue.GetDialogueLine(currentLine);
+            // dialogueText.text = currentDialogue.GetDialogueLine(currentLine);
 
             if(currentDialogue.GetDialogueAudio(currentLine) != null)
             audioSource.PlayOneShot(currentDialogue.GetDialogueAudio(currentLine));
@@ -67,22 +64,21 @@ public class NPCDialogue : MonoBehaviour
                 for(int i = 0; i < currentDialogue.GetCurrentDialogue(currentLine).choices.Length; i++)
                 {
                     waitingForChoice = true;
-                    choiceButtons[i].gameObject.SetActive(true);
+                    // choiceButtons[i].gameObject.SetActive(true);
                 }
             }
         }
     }
     public void PlayEndDialogue()
     {
+        inDialogue = true;
         audioSource.Stop();
         currentDialogue = dialogueEnd;
-        interactionPrompt.enabled = false;
-        dialogueText.enabled = true;
 
         randomNumDialogue = Random.Range(0, currentDialogue.GetDialogueLength());
 
         if(currentDialogue.GetDialogueLine(randomNumDialogue) != null)
-        dialogueText.text = currentDialogue.GetDialogueLine(randomNumDialogue);
+        // dialogueText.text = currentDialogue.GetDialogueLine(randomNumDialogue);
 
         if(currentDialogue.GetDialogueAudio(randomNumDialogue) != null)
         audioSource.PlayOneShot(currentDialogue.GetDialogueAudio(randomNumDialogue));
@@ -92,10 +88,10 @@ public class NPCDialogue : MonoBehaviour
     }
     public void UpdateChoiceDialogue(DialogueScriptableObject newDialogueScriptableObject)
     {
-        for(int i = 0; i < choiceButtons.Length; i++)
-        {
-            choiceButtons[i].gameObject.SetActive(false);
-        }
+        // for(int i = 0; i < choiceButtons.Length; i++)
+        // {
+        //     choiceButtons[i].gameObject.SetActive(false);
+        // }
         currentDialogue = newDialogueScriptableObject;
         currentLine = 0;
         PlayDialogue();
@@ -132,10 +128,6 @@ public class NPCDialogue : MonoBehaviour
             return true;
         }
     }
-    public void PlayerLeft()
-    {
-        dialogueCanvas.enabled = false;
-    }
     public Transform GetFocusPoint()
     {
         return focusPointForPlayer;
@@ -143,5 +135,9 @@ public class NPCDialogue : MonoBehaviour
     public bool IsWaitingForChoice()
     {
         return waitingForChoice;
+    }
+    public bool InDialogue()
+    {
+        return inDialogue;
     }
 }

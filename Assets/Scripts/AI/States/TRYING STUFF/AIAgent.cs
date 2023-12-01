@@ -3,37 +3,34 @@ using UnityEngine;
 using UnityEngine.AI;
 public class AIAgent : MonoBehaviour
 {
-    [SerializeField] private AIState startState;
+    [SerializeField] private AIStatesHolder AIStatesHolder;
+    [SerializeField] private NPCDialogue aiDialogue;
     public NavMeshAgent navMeshAgent;
     [HideInInspector] public Vector3 startingPos;
-    public StateSCHandler stateSCHandler;
-    private Vector3 movePosition;
+    public AIStateMachine aiStateMachine;
+    private AIState currentState; // for testing purposes
 
     private void Awake()
     {
-        // initialState.Init();
-        stateSCHandler = new StateSCHandler(this);
+        aiStateMachine = new AIStateMachine(this); // create a new instance of the state machine and assign this ai agent to the constructor
+        for(int i = 0; i < AIStatesHolder.GetStates().Length; i++)
+        {
+            aiStateMachine.RegisterState(AIStatesHolder.GetStates()[i]);
+        }
+        aiStateMachine.ChangeState(AIStatesHolder.GetInitialState());
     }
     private void Start()
     {
         startingPos = transform.position;
-        stateSCHandler.ChangeState(startState);
-        // stateSCHandler.ChangeState(startState);
     }
     private void Update()
     {
-        stateSCHandler.OnUpdate();
-
-        // if (!navMeshAgent.pathPending && navMeshAgent.remainingDistance < 0.5f)
-        // {
-        //     movePosition = new Vector3(startingPos.x + Random.insideUnitSphere.x * 5, startingPos.y, startingPos.z + Random.insideUnitSphere.z * 5);
-
-        //     if(CanMoveToPosition(movePosition))
-        //     {
-        //         navMeshAgent.destination = movePosition;
-        //     }
-        // }
-        // navMeshAgent.destination = movePosition;
+        aiStateMachine.OnUpdate();
+        currentState = aiStateMachine.GetCurrentState();
+    }
+    public void SwitchState(AIState newState)
+    {
+        aiStateMachine.ChangeState(newState);
     }
     public bool CanMoveToPosition(Vector3 randomPos)
     {
@@ -47,16 +44,8 @@ public class AIAgent : MonoBehaviour
         randomPos = Vector3.zero;
         return false;
     }
-    // private void Update()
-    // {
-    //     // initialState.GetStateId().OnUpdate(this);
-    // }
-    IEnumerator StopOnWaypoint(float timer)
+    public NPCDialogue GetNPCDialogue()
     {
-        navMeshAgent.speed = 0;
-        
-        yield return new WaitForSeconds(timer);
-
-        navMeshAgent.speed = 5;
+        return aiDialogue;
     }
 }
